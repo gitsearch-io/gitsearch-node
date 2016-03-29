@@ -23,11 +23,10 @@ import java.util.List;
 import java.util.Map;
 
 public class GitService {
-    private static final String REMOTE_URL = "https://github.com/kaaresylow/test.git";
-    ElasticSearch es = new ElasticSearch();
+    private ElasticSearch es = new ElasticSearch();
 
     public void saveAllFiles(Repository repo, String ref) throws Exception {
-//        Ref head = repo.findRef("HEAD");
+
         Ref head = repo.findRef(ref);
         RevWalk walk = new RevWalk(repo);
 
@@ -125,11 +124,11 @@ public class GitService {
         return git.getRepository().resolve(ref + "^{tree}");
     }
 
-    public void merge(Git git, String ref) throws Exception {
+    private void merge(Git git, String ref) throws Exception {
         git.reset().setMode(ResetCommand.ResetType.HARD).setRef(ref).call();
     }
 
-    public Collection<TrackingRefUpdate> fetch(Git git) throws Exception{
+    private Collection<TrackingRefUpdate> fetch(Git git) throws Exception{
         FetchResult fetchResult = git.fetch().call();
 
         return fetchResult.getTrackingRefUpdates();
@@ -153,15 +152,13 @@ public class GitService {
         return git.branchList().setListMode(ListBranchCommand.ListMode.REMOTE).call();
     }
 
-    private void cloneRepository(String url, String name) throws Exception {
+    public void cloneRepository(String url, String name) throws Exception {
         File localPath = new File(name);
 
-        localPath.delete();
-
-        System.out.println("Cloning from " + REMOTE_URL + " to " + localPath);
+//        localPath.delete();
 
         try (Git result = Git.cloneRepository()
-                .setURI(REMOTE_URL)
+                .setURI(url)
                 .setDirectory(localPath)
                 .call()) {
             System.out.println("Having repository: " + result.getRepository().getDirectory());
@@ -170,11 +167,7 @@ public class GitService {
 
     public Repository getRepository(String path) throws IOException {
         FileRepositoryBuilder builder = new FileRepositoryBuilder();
-//        Repository repository = builder
-//                .readEnvironment()
-//                .findGitDir()
-//                .build();
+
         return builder.findGitDir(new File(path)).build();
-//        return repository;
     }
 }

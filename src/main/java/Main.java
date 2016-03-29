@@ -24,12 +24,18 @@ public class Main {
         System.out.println("hello world");
 //
         GitService gitService = new GitService();
-        Repository repository = gitService.getRepository("test");
+        gitService.cloneRepository(REMOTE_URL, "repositories/test");
+        Repository repository = gitService.getRepository("repositories/test");
+
         Git git = new Git(repository);
+
+        for(Ref branch : gitService.getBranches(git)) {
+            gitService.saveAllFiles(repository, branch.getName());
+        }
 
 //        gitService.pullUpdates(git, repository);
 
-        gitService.pull(git);
+//        gitService.pull(git);
 //        for(Ref ref : gitService.getBranches(git)) {
 //            System.out.println(ref.getName());
 //        }
