@@ -25,48 +25,46 @@ import java.util.Map;
 public class GitService {
     private ElasticSearch es = new ElasticSearch();
 
-    public void saveAllFiles(Repository repo, String ref) throws Exception {
-
-        Ref head = repo.findRef(ref);
-        RevWalk walk = new RevWalk(repo);
+    public void saveAllFiles(Git git, String ref) throws Exception {
+        Repository repository = git.getRepository();
+        Ref head = repository.findRef(ref);
+        RevWalk walk = new RevWalk(repository);
 
         RevCommit commit = walk.parseCommit(head.getObjectId());
         RevTree tree = commit.getTree();
 
-
-        TreeWalk treeWalk = new TreeWalk(repo);
+        TreeWalk treeWalk = new TreeWalk(repository);
         treeWalk.addTree(tree);
         treeWalk.setRecursive(true);
         while (treeWalk.next()) {
             ObjectId objectId = treeWalk.getObjectId(0);
             System.out.println("found: " + treeWalk.getPathString());
-            ObjectLoader loader = repo.open(objectId);
-            System.out.println(objectId.getName());
 
-            es.upsert(objectId.getName(), ref, treeWalk.getPathString(), new String(loader.getBytes()));
+            es.upsert(objectId.getName(), ref, treeWalk.getPathString(), getFileContent(git, objectId));
+
         }
     }
 
-    public void saveFiles(Git git, List<DiffEntry> diffs, String branch) throws Exception{
+    public void updateChangedFiles(Git git, List<DiffEntry> diffs, String branch) throws Exception{
         for(DiffEntry diffEntry : diffs) {
             ObjectId newId = diffEntry.getNewId().toObjectId();
+            ObjectId oldId = diffEntry.getOldId().toObjectId();
             switch (diffEntry.getChangeType()) {
                 case DELETE:
+                    es.delete(oldId.getName(), branch, diffEntry.getOldPath());
                     break;
                 case MODIFY:
-                    ObjectId oldId = diffEntry.getOldId().toObjectId();
+                    es.delete(oldId.getName(), branch, diffEntry.getOldPath());
                     es.upsert(newId.getName(), branch, diffEntry.getNewPath(), getFileContent(git, newId));
                     break;
                 case ADD:
                     es.upsert(newId.getName(), branch, diffEntry.getNewPath(), getFileContent(git, newId));
                     break;
                 case RENAME:
-
                     break;
                 default:
                     break;
             }
-
         }
     }
 
@@ -74,21 +72,6 @@ public class GitService {
         ObjectLoader objectLoader = git.getRepository().open(objectId);
         return new String(objectLoader.getBytes());
     }
-
-//    public void pullUpdates(Git git, Repository repo) throws Exception {
-//        ObjectId oldHead = repo.resolve("HEAD^{tree}");
-//        System.out.println("oldHead: " + oldHead);
-//        FetchResult fetchResult = git.fetch().call();
-//
-//        for(TrackingRefUpdate updated : fetchResult.getTrackingRefUpdates()) {
-//            System.out.println(updated.getLocalName());
-//            System.out.println(updated.getResult());
-//        }
-//
-//        git.reset().setMode(ResetCommand.ResetType.HARD).setRef("refs/remotes/origin/master").call();
-//        ObjectId newHead = repo.resolve("HEAD^{tree}");
-//        System.out.println("newHead: " + newHead);
-//    }
 
     public void pull(Git git) throws Exception{
         Map<String, ObjectId> currentWorkTree = getCurrentWorkTrees(git);
@@ -99,14 +82,14 @@ public class GitService {
             switch (update.getResult()) {
                 case NEW:
                     merge(git, update.getLocalName());
-                    saveAllFiles(git.getRepository(), update.getLocalName());
+                    saveAllFiles(git, update.getLocalName());
                     break;
                 default:
                     ObjectId oldHead = currentWorkTree.get(update.getLocalName());
                     merge(git, update.getLocalName());
                     ObjectId newHead = getWorkTree(git, update.getLocalName());
                     List<DiffEntry> diffs = getChangedFiles(git, oldHead, newHead);
-                    saveFiles(git, diffs, update.getLocalName());
+                    updateChangedFiles(git, diffs, update.getLocalName());
             }
         }
     }
@@ -140,12 +123,10 @@ public class GitService {
         oldTreeIter.reset(reader, oldHead);
         CanonicalTreeParser newTreeIter = new CanonicalTreeParser();
         newTreeIter.reset(reader, newHead);
-        List<DiffEntry> diffs = git.diff()
+        return git.diff()
                 .setNewTree(newTreeIter)
                 .setOldTree(oldTreeIter)
                 .call();
-
-        return diffs;
     }
 
     public List<Ref> getBranches(Git git) throws Exception{
