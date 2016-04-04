@@ -9,8 +9,13 @@ import io.searchbox.client.JestClientFactory;
 import io.searchbox.client.JestResult;
 import io.searchbox.client.config.HttpClientConfig;
 import io.searchbox.core.Update;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 public class ElasticSearch {
+    private Logger logger = LoggerFactory.getLogger(this.getClass().getName());
     private JestClient client;
 
     public ElasticSearch() {
@@ -22,22 +27,28 @@ public class ElasticSearch {
         client = factory.getObject();
     }
 
-    public void upsert(String id, String branch, String path, String content) throws Exception {
+    public void upsert(String id, String branch, String path, String content) {
         System.out.println(id);
         UpdateDTO updateDTO = getUpsertUpdateDTO(new FileBranchDTO(branch, path), content);
         executeUpdate(updateDTO, id);
     }
 
-    public void delete(String id, String branch, String path) throws Exception{
-        System.out.println(id);
+    public void delete(String id, String branch, String path) {
         UpdateDTO updateDTO = getDeleteUpdateDTO(new FileBranchDTO(branch, path));
         executeUpdate(updateDTO, id);
     }
 
-    private void executeUpdate(UpdateDTO updateDTO, String id) throws Exception {
-        System.out.println(new ObjectMapper().writeValueAsString(updateDTO));
-        JestResult result = client.execute(new Update.Builder(updateDTO).index("gitsearch").type("codefile").id(id).build());
-        System.out.println(result.getErrorMessage());
+    private void executeUpdate(UpdateDTO updateDTO, String id) {
+        JestResult result = null;
+        try {
+            result = client.execute(new Update.Builder(updateDTO).index("gitsearch").type("codefile").id(id).build());
+        } catch (IOException e) {
+            logger.error(e.toString(), e);
+        } finally {
+            if (result != null) {
+                logger.error("Result from Elastic Search", result);
+            }
+        }
     }
 
     private UpdateDTO getDeleteUpdateDTO(FileBranchDTO fileBranchDTO) {
