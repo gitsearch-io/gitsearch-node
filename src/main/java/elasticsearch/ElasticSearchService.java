@@ -14,11 +14,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-public class ElasticSearch {
+public class ElasticSearchService {
     private Logger logger = LoggerFactory.getLogger(this.getClass().getName());
     private JestClient client;
 
-    public ElasticSearch() {
+    public ElasticSearchService() {
         JestClientFactory factory = new JestClientFactory();
         factory.setHttpClientConfig(new HttpClientConfig
                 .Builder("http://localhost:9200")

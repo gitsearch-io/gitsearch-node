@@ -1,3 +1,5 @@
+import elasticsearch.ElasticSearchService;
+import git.GitRepositoryService;
 import git.GitService;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Repository;
@@ -10,22 +12,24 @@ public class Main {
 
     public static void main (String[] args) throws Exception {
         System.out.println("hello world");
+        GitRepositoryService gitRepositoryService = new GitRepositoryService();
 
+        Git git = gitRepositoryService.getRepository("repositories/test");
+
+        ElasticSearchService elasticSearchService = new ElasticSearchService();
 
 //
-        GitService gitService = new GitService();
+        GitService gitService = new GitService(git, elasticSearchService);
+        git.pull();
 //        gitService.cloneRepository(REMOTE_URL, "repositories/jquery");
-        Repository repository = gitService.getRepository("repositories/test");
+//        Repository repository = gitService.getRepository("repositories/test");
 //
-        Git git = new Git(repository);
 
 //        for(Ref branch : gitService.getBranches(git)) {
 //            gitService.saveAllFiles(git, branch.getName());
 //        }
 
 
-
-        gitService.pull(git);
 
 //        gitService.pull(git);
 //        for(Ref ref : gitService.getBranches(git)) {
