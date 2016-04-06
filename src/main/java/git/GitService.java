@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 public class GitService {
-    private Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private ElasticSearchService elasticSearchService;
     private Git git;
@@ -94,7 +94,7 @@ public class GitService {
                     elasticSearchService.upsert(newId.getName(), branch, diffEntry.getNewPath(), getFileContent(newId));
                     break;
                 case RENAME:
-                    logger.error("Rename is an unknown case");
+                    logger.error("RENAME is an unknown case");
                     break;
                 default:
                     break;

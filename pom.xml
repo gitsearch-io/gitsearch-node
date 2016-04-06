@@ -24,12 +24,6 @@
             <groupId>org.eclipse.jgit</groupId>
             <artifactId>org.eclipse.jgit</artifactId>
             <version>4.2.0.201601211800-r</version>
-            <!--<exclusions>-->
-                <!--<exclusion>  &lt;!&ndash; declare the exclusion here &ndash;&gt;-->
-                    <!--<groupId>org.apache.httpcomponents</groupId>-->
-                    <!--<artifactId>httpcore</artifactId>-->
-                <!--</exclusion>-->
-            <!--</exclusions>-->
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -41,6 +35,12 @@
             <artifactId>slf4j-api</artifactId>
             <version>1.7.20</version>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.21</version>
+        </dependency>
+
 
 
     </dependencies>

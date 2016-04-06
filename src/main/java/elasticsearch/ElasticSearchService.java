@@ -1,6 +1,5 @@
 package elasticsearch;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import elasticsearch.dto.FileBranchDTO;
 import elasticsearch.dto.UpdateDTO;
 import elasticsearch.dto.UpsertDTO;
@@ -15,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 public class ElasticSearchService {
-    private Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
     private JestClient client;
 
     public ElasticSearchService() {

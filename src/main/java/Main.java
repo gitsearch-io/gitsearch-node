@@ -20,7 +20,7 @@ public class Main {
 
 //
         GitService gitService = new GitService(git, elasticSearchService);
-        git.pull();
+        gitService.pull();
 //        gitService.cloneRepository(REMOTE_URL, "repositories/jquery");
 //        Repository repository = gitService.getRepository("repositories/test");
 //
