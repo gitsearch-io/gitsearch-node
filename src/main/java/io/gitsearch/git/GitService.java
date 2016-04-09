@@ -1,6 +1,6 @@
-package git;
+package io.gitsearch.git;
 
-import elasticsearch.ElasticSearchService;
+import io.gitsearch.elasticsearch.ElasticSearchService;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.ResetCommand;

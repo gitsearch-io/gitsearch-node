@@ -1,4 +1,4 @@
-package elasticsearch.dto;
+package io.gitsearch.elasticsearch.dto;
 
 import java.util.ArrayList;
 import java.util.List;

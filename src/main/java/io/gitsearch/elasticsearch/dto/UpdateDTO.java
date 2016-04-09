@@ -1,4 +1,4 @@
-package elasticsearch.dto;
+package io.gitsearch.elasticsearch.dto;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,8 +1,8 @@
-package elasticsearch;
+package io.gitsearch.elasticsearch;
 
-import elasticsearch.dto.FileBranchDTO;
-import elasticsearch.dto.UpdateDTO;
-import elasticsearch.dto.UpsertDTO;
+import io.gitsearch.elasticsearch.dto.FileBranchDTO;
+import io.gitsearch.elasticsearch.dto.UpdateDTO;
+import io.gitsearch.elasticsearch.dto.UpsertDTO;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestClientFactory;
 import io.searchbox.client.JestResult;
@@ -17,10 +17,10 @@ public class ElasticSearchService {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private JestClient client;
 
-    public ElasticSearchService() {
+    public ElasticSearchService(String url) {
         JestClientFactory factory = new JestClientFactory();
         factory.setHttpClientConfig(new HttpClientConfig
-                .Builder("http://localhost:9200")
+                .Builder(url)
                 .multiThreaded(true)
                 .build());
         client = factory.getObject();
@@ -45,7 +45,7 @@ public class ElasticSearchService {
             logger.error(e.toString(), e);
         } finally {
             if (result != null) {
-                logger.error("Result from Elastic Search", result);
+                logger.error("Result from Elastic Search: " + result.getErrorMessage());
             }
         }
     }
