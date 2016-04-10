@@ -24,4 +24,12 @@ public class FileBranchDTO {
     public void setFilePath(String filePath) {
         this.filePath = filePath;
     }
+
+    @Override
+    public String toString() {
+        return "FileBranchDTO{" +
+                "branchName='" + branchName + '\'' +
+                ", filePath='" + filePath + '\'' +
+                '}';
+    }
 }

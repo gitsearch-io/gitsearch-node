@@ -22,4 +22,12 @@ public class UpsertDTO {
     public void addFileBranch(FileBranchDTO fileBranchDTO) {
         fileBranches.add(fileBranchDTO);
     }
+
+    @Override
+    public String toString() {
+        return "UpsertDTO{" +
+                "content='" + content + '\'' +
+                ", fileBranches=" + fileBranches +
+                '}';
+    }
 }

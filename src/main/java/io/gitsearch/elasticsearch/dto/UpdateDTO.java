@@ -31,4 +31,13 @@ public class UpdateDTO {
     public void setUpsert(UpsertDTO upsert) {
         this.upsert = upsert;
     }
+
+    @Override
+    public String toString() {
+        return "UpdateDTO{" +
+                "script='" + script + '\'' +
+                ", params=" + params +
+                ", upsert=" + upsert +
+                '}';
+    }
 }

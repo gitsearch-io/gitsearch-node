@@ -1,52 +1,56 @@
 package io.gitsearch;
 
+import io.gitsearch.elasticsearch.ElasticSearchService;
+import io.gitsearch.git.GitRepositoryService;
+import io.gitsearch.git.GitService;
+import io.gitsearch.messagequeue.MessageService;
+import io.gitsearch.messagequeue.Queue;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 public class Main {
-    private static final String REMOTE_URL = "https://github.com/kaaresylow/test.git";
-//    private static final String REMOTE_URL = "https://github.com/jquery/jquery.git";
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-
+    private GitRepositoryService gitRepositoryService;
+    private ElasticSearchService elasticSearchService;
 
     public static void main (String[] args) throws Exception {
-
-        System.out.println("hello world");
-
-
-
-
-//        GitRepositoryService gitRepositoryService = new GitRepositoryService();
-//
-//        Git git = gitRepositoryService.getRepository("repositories/test");
-//
-//        ElasticSearchService elasticSearchService = new ElasticSearchService();
-//
-//        GitService gitService = new GitService(git, elasticSearchService);
-//        gitService.pull();
-
-
-//        ConnectionFactory factory = new ConnectionFactory();
-//        factory.setHost("localhost");
-//        Connection connection = factory.newConnection();
-//        Channel channel = connection.createChannel();
-//        channel.queueDeclare("hello queue", false, false, false, null);
-//        System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
-//
-//        Consumer consumer = new DefaultConsumer(channel) {
-//            @Override
-//            public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body)
-//                    throws IOException {
-//                String message = new String(body, "UTF-8");
-//                System.out.println(" [x] Received '" + message + "'");
-//            }
-//        };
-//
-//        channel.basicConsume("hello queue", true, consumer);
-
-
-
-
+        Main main = new Main();
+        main.listenToMessageQueue();
     }
 
+    public Main() {
+        gitRepositoryService = new GitRepositoryService();
+        elasticSearchService = new ElasticSearchService("http://localhost:9200");
+    }
 
+    private void listenToMessageQueue() throws Exception{
+        MessageService messageService = new MessageService("localhost");
+        messageService.setConsumer(Queue.CLONE, this::cloneRepository);
+        messageService.setConsumer(Queue.UPDATE, this::updateRepository);
+    }
 
+    private void updateRepository(String message) {
+        try (Git git = gitRepositoryService.getRepository(message)){
+            GitService gitService = new GitService(git, elasticSearchService);
+            gitService.pullUpdates();
+        } catch (IOException e) {
+            logger.error(e.toString(), e);
+        }
+    }
+
+    private void cloneRepository(String message) {
+        try (Git git = gitRepositoryService.cloneRepository(message)) {
+            if(git != null) {
+                GitService gitService = new GitService(git, elasticSearchService);
+                gitService.saveAllFilesInRepository();
+            }
+        } catch (GitAPIException e) {
+            logger.error(e.toString(), e);
+        }
+    }
 }

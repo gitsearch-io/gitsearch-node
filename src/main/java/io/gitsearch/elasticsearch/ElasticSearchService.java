@@ -27,7 +27,6 @@ public class ElasticSearchService {
     }
 
     public void upsert(String id, String branch, String path, String content) {
-        System.out.println(id);
         UpdateDTO updateDTO = getUpsertUpdateDTO(new FileBranchDTO(branch, path), content);
         executeUpdate(updateDTO, id);
     }
@@ -38,13 +37,14 @@ public class ElasticSearchService {
     }
 
     private void executeUpdate(UpdateDTO updateDTO, String id) {
+        logger.info(id);
         JestResult result = null;
         try {
             result = client.execute(new Update.Builder(updateDTO).index("gitsearch").type("codefile").id(id).build());
         } catch (IOException e) {
             logger.error(e.toString(), e);
         } finally {
-            if (result != null) {
+            if (result != null && result.getErrorMessage() != null) {
                 logger.error("Result from Elastic Search: " + result.getErrorMessage());
             }
         }

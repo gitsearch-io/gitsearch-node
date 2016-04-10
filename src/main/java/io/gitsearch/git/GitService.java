@@ -34,16 +34,16 @@ public class GitService {
         this.git = git;
     }
 
-    public void pull(){
+    public void pullUpdates() {
         try {
             Map<String, ObjectId> currentWorkTree = getCurrentWorkTrees();
-
             Collection<TrackingRefUpdate> fetchResults = fetch();
+
             for (TrackingRefUpdate update : fetchResults) {
                 switch (update.getResult()) {
                     case NEW:
                         merge(update.getLocalName());
-                        saveAllFiles(update.getLocalName());
+                        saveAllFilesInBranch(update.getLocalName());
                         break;
                     default:
                         ObjectId oldHead = currentWorkTree.get(update.getLocalName());
@@ -59,7 +59,17 @@ public class GitService {
         }
     }
 
-    private void saveAllFiles(String ref) throws IOException {
+    public void saveAllFilesInRepository() {
+        try {
+            for(Ref ref: getBranches()) {
+                saveAllFilesInBranch(ref.getName());
+            }
+        } catch (GitAPIException | IOException e) {
+            logger.error(e.getMessage(), e);
+        }
+    }
+
+    private void saveAllFilesInBranch(String ref) throws IOException {
         Repository repository = git.getRepository();
         Ref head = repository.findRef(ref);
         RevWalk walk = new RevWalk(repository);
@@ -72,9 +82,7 @@ public class GitService {
         treeWalk.setRecursive(true);
         while (treeWalk.next()) {
             ObjectId objectId = treeWalk.getObjectId(0);
-            System.out.println("found: " + treeWalk.getPathString());
             elasticSearchService.upsert(objectId.getName(), ref, treeWalk.getPathString(), getFileContent(objectId));
-
         }
     }
 
