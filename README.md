@@ -1,8 +1,8 @@
 # gitsearch-node
 
-# Dependencies
+## Dependencies
 - Elasticsearch
 - Rabbitmq
 
-# Start
+## Start
 mvn package exec:java
