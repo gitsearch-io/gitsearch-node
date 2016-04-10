@@ -17,6 +17,7 @@ public class Main {
 
     private GitRepositoryService gitRepositoryService;
     private ElasticSearchService elasticSearchService;
+    private PropertyService PropertyService;
 
     public static void main (String[] args) throws Exception {
         Main main = new Main();
@@ -24,12 +25,13 @@ public class Main {
     }
 
     public Main() {
+        PropertyService = new PropertyService();
         gitRepositoryService = new GitRepositoryService();
-        elasticSearchService = new ElasticSearchService("http://localhost:9200");
+        elasticSearchService = new ElasticSearchService(PropertyService.getProperty("elasticsearch.host"));
     }
 
     private void listenToMessageQueue() throws Exception{
-        MessageService messageService = new MessageService("localhost");
+        MessageService messageService = new MessageService(PropertyService.getProperty("rabbitmq.host"));
         messageService.setConsumer(Queue.CLONE, this::cloneRepository);
         messageService.setConsumer(Queue.UPDATE, this::updateRepository);
     }

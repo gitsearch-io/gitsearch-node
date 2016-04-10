@@ -18,9 +18,9 @@ public class MessageService {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private Channel channel;
 
-    public MessageService(String url) throws Exception {
+    public MessageService(String host) throws Exception {
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost(url);
+        factory.setHost(host);
         Connection connection = factory.newConnection();
         channel = connection.createChannel();
     }

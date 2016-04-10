@@ -17,10 +17,10 @@ public class ElasticSearchService {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private JestClient client;
 
-    public ElasticSearchService(String url) {
+    public ElasticSearchService(String host) {
         JestClientFactory factory = new JestClientFactory();
         factory.setHttpClientConfig(new HttpClientConfig
-                .Builder(url)
+                .Builder(host)
                 .multiThreaded(true)
                 .build());
         client = factory.getObject();

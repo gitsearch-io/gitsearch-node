@@ -1,0 +1,2 @@
+elasticsearch.host=http://localhost:9200
+rabbitmq.host=localhost
