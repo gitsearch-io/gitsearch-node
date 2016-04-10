@@ -13,19 +13,20 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 public class MessageService {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private Channel channel;
 
-    public MessageService(String host) throws Exception {
+    public MessageService(String host) throws IOException, TimeoutException {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(host);
         Connection connection = factory.newConnection();
         channel = connection.createChannel();
     }
 
-    public void setConsumer(Queue queue, java.util.function.Consumer<String> message) throws Exception {
+    public void setConsumer(Queue queue, java.util.function.Consumer<String> message) throws IOException {
         Map<String, Object> args = new HashMap<>();
         args.put("x-priority", queue.getPriority());
         channel.queueDeclare(queue.name(), false, false, false, null);

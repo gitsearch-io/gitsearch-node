@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
 public class Main {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -30,10 +31,14 @@ public class Main {
         elasticSearchService = new ElasticSearchService(PropertyService.getProperty("elasticsearch.host"));
     }
 
-    private void listenToMessageQueue() throws Exception{
-        MessageService messageService = new MessageService(PropertyService.getProperty("rabbitmq.host"));
-        messageService.setConsumer(Queue.CLONE, this::cloneRepository);
-        messageService.setConsumer(Queue.UPDATE, this::updateRepository);
+    private void listenToMessageQueue() {
+        try {
+            MessageService messageService = new MessageService(PropertyService.getProperty("rabbitmq.host"));
+            messageService.setConsumer(Queue.CLONE, this::cloneRepository);
+            messageService.setConsumer(Queue.UPDATE, this::updateRepository);
+        } catch (IOException | TimeoutException e) {
+            logger.error(e.toString(), e);
+        }
     }
 
     private void updateRepository(String message) {
