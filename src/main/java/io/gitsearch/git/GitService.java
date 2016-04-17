@@ -84,7 +84,7 @@ public class GitService {
         treeWalk.setRecursive(true);
         while (treeWalk.next()) {
             ObjectId objectId = treeWalk.getObjectId(0);
-            elasticSearchService.upsert(objectId.getName(), ref, treeWalk.getPathString(), getFileContent(objectId), url);
+            elasticSearchService.upsert(objectId.getName(), getBranchName(ref), treeWalk.getPathString(), getFileContent(objectId), url);
         }
     }
 
@@ -154,5 +154,12 @@ public class GitService {
 
     private List<Ref> getBranches() throws GitAPIException {
         return git.branchList().setListMode(ListBranchCommand.ListMode.REMOTE).call();
+    }
+
+    private String getBranchName(String branchRef) {
+        final String branchPrefix = "refs/remotes/origin/";
+        String branchName = branchRef.substring(branchPrefix.length(), branchRef.length());
+
+        return branchName;
     }
 }
