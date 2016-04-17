@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static io.gitsearch.Utils.toBase64;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
 
@@ -25,6 +26,7 @@ public class ElasticSearchServiceTest extends AbstractElasticsearchTest {
     private String branch = "master";
     private String filePath = "/path/to/file";
     private String content = "file content";
+    private String url = "http://repository.com";
 
     private ElasticSearchService elasticSearchService;
     private Client client;
@@ -48,9 +50,9 @@ public class ElasticSearchServiceTest extends AbstractElasticsearchTest {
 
     @Test
     public void upsert_should_create_document_in_es() throws Exception {
-        elasticSearchService.upsert(documentID, branch, filePath, content);
+        elasticSearchService.upsert(documentID, branch, filePath, content, url);
 
-        GetResponse response = client.prepareGet(ES_INDEX, ES_TYPE, documentID).get();
+        GetResponse response = client.prepareGet(ES_INDEX, ES_TYPE, documentID + toBase64(url)).get();
         List<Map<String, String>> fileBranches = parseFileBranches(response);
         assertEquals(1, fileBranches.size());
         assertEquals(filePath, fileBranches.get(0).get("filePath"));
@@ -61,10 +63,10 @@ public class ElasticSearchServiceTest extends AbstractElasticsearchTest {
     @Test
     public void upsert_should_update_document_in_es() throws Exception {
         String featureBranch = "feature";
-        elasticSearchService.upsert(documentID, branch, filePath, content);
-        elasticSearchService.upsert(documentID, featureBranch, filePath, content);
+        elasticSearchService.upsert(documentID, branch, filePath, content, url);
+        elasticSearchService.upsert(documentID, featureBranch, filePath, content, url);
 
-        GetResponse response = client.prepareGet(ES_INDEX, ES_TYPE, documentID).get();
+        GetResponse response = client.prepareGet(ES_INDEX, ES_TYPE, documentID + toBase64(url)).get();
         List<Map<String, String>> fileBranches = parseFileBranches(response);
         assertEquals(2, fileBranches.size());
         assertEquals(filePath, fileBranches.get(0).get("filePath"));
@@ -83,7 +85,7 @@ public class ElasticSearchServiceTest extends AbstractElasticsearchTest {
         fileBranches.add(fileBranch);
         insertDocument(documentID, content, fileBranches);
 
-        elasticSearchService.delete(documentID, branch, filePath);
+        elasticSearchService.delete(documentID, branch, filePath, url);
 
         GetResponse response = client.prepareGet(ES_INDEX, ES_TYPE, documentID).get();
         assertFalse(response.isExists());
@@ -106,9 +108,9 @@ public class ElasticSearchServiceTest extends AbstractElasticsearchTest {
 
         insertDocument(documentID, content, fileBranches);
 
-        elasticSearchService.delete(documentID, featureBranch, filePath);
+        elasticSearchService.delete(documentID, featureBranch, filePath, url);
 
-        GetResponse response = client.prepareGet(ES_INDEX, ES_TYPE, documentID).get();
+        GetResponse response = client.prepareGet(ES_INDEX, ES_TYPE, documentID + toBase64(url)).get();
         List<Map<String, String>> actualFileBranches = parseFileBranches(response);
         assertEquals(1, actualFileBranches.size());
         assertEquals(filePath, actualFileBranches.get(0).get("filePath"));
@@ -121,7 +123,7 @@ public class ElasticSearchServiceTest extends AbstractElasticsearchTest {
         json.put("content", content);
         json.put("fileBranches", fileBranches);
 
-        client.prepareIndex(ES_INDEX, ES_TYPE, documentID).setSource(json).get();
+        client.prepareIndex(ES_INDEX, ES_TYPE, documentID + toBase64(url)).setSource(json).get();
     }
 
     private List<Map<String, String>> parseFileBranches(GetResponse response) {

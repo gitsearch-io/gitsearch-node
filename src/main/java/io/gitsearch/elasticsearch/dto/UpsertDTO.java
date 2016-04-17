@@ -5,6 +5,16 @@ import java.util.List;
 
 public class UpsertDTO {
     private String content;
+    private String url;
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
     private List<FileBranchDTO> fileBranches = new ArrayList<>();
 
     public String getContent() {
@@ -27,6 +37,7 @@ public class UpsertDTO {
     public String toString() {
         return "UpsertDTO{" +
                 "content='" + content + '\'' +
+                ", url='" + url + '\'' +
                 ", fileBranches=" + fileBranches +
                 '}';
     }

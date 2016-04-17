@@ -9,7 +9,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Base64;
+
+import static io.gitsearch.Utils.toBase64;
 
 public class GitRepositoryService {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -32,9 +33,5 @@ public class GitRepositoryService {
         Repository repository = builder.findGitDir(new File("repositories/" + toBase64(url))).build();
 
         return new Git(repository);
-    }
-
-    private String toBase64(String url) {
-        return Base64.getUrlEncoder().encodeToString(url.getBytes());
     }
 }

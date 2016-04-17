@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
+import static io.gitsearch.Utils.toBase64;
+
 public class ElasticSearchService {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private JestClient client;
@@ -26,14 +28,14 @@ public class ElasticSearchService {
         client = factory.getObject();
     }
 
-    public void upsert(String id, String branch, String path, String content) {
-        UpdateDTO updateDTO = getUpsertUpdateDTO(new FileBranchDTO(branch, path), content);
-        executeUpdate(updateDTO, id);
+    public void upsert(String id, String branch, String path, String content, String url) {
+        UpdateDTO updateDTO = getUpsertUpdateDTO(new FileBranchDTO(branch, path), content, url);
+        executeUpdate(updateDTO, id + toBase64(url));
     }
 
-    public void delete(String id, String branch, String path) {
+    public void delete(String id, String branch, String path, String url) {
         UpdateDTO updateDTO = getDeleteUpdateDTO(new FileBranchDTO(branch, path));
-        executeUpdate(updateDTO, id);
+        executeUpdate(updateDTO, id + toBase64(url));
     }
 
     private void executeUpdate(UpdateDTO updateDTO, String id) {
@@ -60,7 +62,7 @@ public class ElasticSearchService {
         return updateDTO;
     }
 
-    private UpdateDTO getUpsertUpdateDTO(FileBranchDTO fileBranchDTO, String content) {
+    private UpdateDTO getUpsertUpdateDTO(FileBranchDTO fileBranchDTO, String content, String url) {
         String script = "ctx._source.fileBranches += branch";
         UpdateDTO update = new UpdateDTO();
         update.setScript(script);
@@ -69,7 +71,7 @@ public class ElasticSearchService {
         UpsertDTO upsert = new UpsertDTO();
         upsert.addFileBranch(fileBranchDTO);
         upsert.setContent(content);
-
+        upsert.setUrl(url);
         update.setUpsert(upsert);
 
         return update;

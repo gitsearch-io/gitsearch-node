@@ -43,7 +43,7 @@ public class Main {
 
     private void updateRepository(String message) {
         try (Git git = gitRepositoryService.getRepository(message)){
-            GitService gitService = new GitService(git, elasticSearchService);
+            GitService gitService = new GitService(git, elasticSearchService, message);
             gitService.pullUpdates();
         } catch (IOException e) {
             logger.error(e.toString(), e);
@@ -53,7 +53,7 @@ public class Main {
     private void cloneRepository(String message) {
         try (Git git = gitRepositoryService.cloneRepository(message)) {
             if(git != null) {
-                GitService gitService = new GitService(git, elasticSearchService);
+                GitService gitService = new GitService(git, elasticSearchService, message);
                 gitService.saveAllFilesInRepository();
             }
         } catch (GitAPIException e) {

@@ -28,10 +28,12 @@ public class GitService {
 
     private ElasticSearchService elasticSearchService;
     private Git git;
+    private String url;
 
-    public GitService(Git git, ElasticSearchService elasticSearchService) {
+    public GitService(Git git, ElasticSearchService elasticSearchService, String url) {
         this.elasticSearchService = elasticSearchService;
         this.git = git;
+        this.url = url;
     }
 
     public void pullUpdates() {
@@ -82,7 +84,7 @@ public class GitService {
         treeWalk.setRecursive(true);
         while (treeWalk.next()) {
             ObjectId objectId = treeWalk.getObjectId(0);
-            elasticSearchService.upsert(objectId.getName(), ref, treeWalk.getPathString(), getFileContent(objectId));
+            elasticSearchService.upsert(objectId.getName(), ref, treeWalk.getPathString(), getFileContent(objectId), url);
         }
     }
 
@@ -92,14 +94,14 @@ public class GitService {
             ObjectId oldId = diffEntry.getOldId().toObjectId();
             switch (diffEntry.getChangeType()) {
                 case DELETE:
-                    elasticSearchService.delete(oldId.getName(), branch, diffEntry.getOldPath());
+                    elasticSearchService.delete(oldId.getName(), branch, diffEntry.getOldPath(), url);
                     break;
                 case MODIFY:
-                    elasticSearchService.delete(oldId.getName(), branch, diffEntry.getOldPath());
-                    elasticSearchService.upsert(newId.getName(), branch, diffEntry.getNewPath(), getFileContent(newId));
+                    elasticSearchService.delete(oldId.getName(), branch, diffEntry.getOldPath(), url);
+                    elasticSearchService.upsert(newId.getName(), branch, diffEntry.getNewPath(), getFileContent(newId), url);
                     break;
                 case ADD:
-                    elasticSearchService.upsert(newId.getName(), branch, diffEntry.getNewPath(), getFileContent(newId));
+                    elasticSearchService.upsert(newId.getName(), branch, diffEntry.getNewPath(), getFileContent(newId), url);
                     break;
                 case RENAME:
                     logger.error("RENAME is an unknown case");
