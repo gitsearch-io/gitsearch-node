@@ -1,6 +1,6 @@
 package io.gitsearch;
 
-import io.gitsearch.elasticsearch.ElasticSearchService;
+import io.gitsearch.search.SearchService;
 import io.gitsearch.git.GitRepositoryService;
 import io.gitsearch.git.GitService;
 import io.gitsearch.messagequeue.MessageService;
@@ -17,7 +17,7 @@ public class Main {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private GitRepositoryService gitRepositoryService;
-    private ElasticSearchService elasticSearchService;
+    private SearchService searchService;
     private PropertyService PropertyService;
 
     public static void main (String[] args) throws Exception {
@@ -28,7 +28,7 @@ public class Main {
     public Main() {
         PropertyService = new PropertyService();
         gitRepositoryService = new GitRepositoryService();
-        elasticSearchService = new ElasticSearchService(PropertyService.getProperty("elasticsearch.host"));
+        searchService = new SearchService(PropertyService.getProperty("elasticsearch.host"));
     }
 
     private void listenToMessageQueue() {
@@ -43,7 +43,7 @@ public class Main {
 
     private void updateRepository(String message) {
         try (Git git = gitRepositoryService.getRepository(message)){
-            GitService gitService = new GitService(git, elasticSearchService, message);
+            GitService gitService = new GitService(git, searchService, message);
             gitService.pullUpdates();
         } catch (IOException e) {
             logger.error(e.toString(), e);
@@ -53,7 +53,7 @@ public class Main {
     private void cloneRepository(String message) {
         try (Git git = gitRepositoryService.cloneRepository(message)) {
             if(git != null) {
-                GitService gitService = new GitService(git, elasticSearchService, message);
+                GitService gitService = new GitService(git, searchService, message);
                 gitService.saveAllFilesInRepository();
             }
         } catch (GitAPIException e) {

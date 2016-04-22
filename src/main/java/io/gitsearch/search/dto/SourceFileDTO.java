@@ -1,9 +1,9 @@
-package io.gitsearch.elasticsearch.dto;
+package io.gitsearch.search.dto;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class UpsertDTO {
+public class SourceFileDTO {
     private String content;
     private String url;
 
@@ -11,8 +11,9 @@ public class UpsertDTO {
         return url;
     }
 
-    public void setUrl(String url) {
+    public SourceFileDTO setUrl(String url) {
         this.url = url;
+        return this;
     }
 
     private List<FileBranchDTO> fileBranches = new ArrayList<>();
@@ -21,21 +22,23 @@ public class UpsertDTO {
         return content;
     }
 
-    public void setContent(String content) {
+    public SourceFileDTO setContent(String content) {
         this.content = content;
+        return this;
     }
 
     public List<FileBranchDTO> getFileBranches() {
         return fileBranches;
     }
 
-    public void addFileBranch(FileBranchDTO fileBranchDTO) {
+    public SourceFileDTO addFileBranch(FileBranchDTO fileBranchDTO) {
         fileBranches.add(fileBranchDTO);
+        return this;
     }
 
     @Override
     public String toString() {
-        return "UpsertDTO{" +
+        return "SourceFileDTO{" +
                 "content='" + content + '\'' +
                 ", url='" + url + '\'' +
                 ", fileBranches=" + fileBranches +

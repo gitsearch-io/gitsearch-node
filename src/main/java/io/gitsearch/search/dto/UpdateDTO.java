@@ -1,4 +1,6 @@
-package io.gitsearch.elasticsearch.dto;
+package io.gitsearch.search.dto;
+
+import io.searchbox.core.Update;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,30 +8,33 @@ import java.util.Map;
 public class UpdateDTO {
     private String script;
     private Map<String, Object> params = new HashMap<>();;
-    private UpsertDTO upsert;
+    private SourceFileDTO sourceFileDTO;
 
     public String getScript() {
         return script;
     }
 
-    public void setScript(String script) {
+    public UpdateDTO setScript(String script) {
         this.script = script;
+        return this;
     }
 
     public Map<String, Object> getParams() {
         return params;
     }
 
-    public void addParam(String paramName, Object paramValue) {
+    public UpdateDTO addParam(String paramName, Object paramValue) {
         params.put(paramName, paramValue);
+        return this;
     }
 
-    public UpsertDTO getUpsert() {
-        return upsert;
+    public SourceFileDTO setSourceFileDTO() {
+        return sourceFileDTO;
     }
 
-    public void setUpsert(UpsertDTO upsert) {
-        this.upsert = upsert;
+    public UpdateDTO setSourceFileDTO(SourceFileDTO sourceFileDTO) {
+        this.sourceFileDTO = sourceFileDTO;
+        return this;
     }
 
     @Override
@@ -37,7 +42,7 @@ public class UpdateDTO {
         return "UpdateDTO{" +
                 "script='" + script + '\'' +
                 ", params=" + params +
-                ", upsert=" + upsert +
+                ", upsert=" + sourceFileDTO +
                 '}';
     }
 }

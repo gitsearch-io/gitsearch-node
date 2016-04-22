@@ -1,6 +1,6 @@
 package io.gitsearch.git;
 
-import io.gitsearch.elasticsearch.ElasticSearchService;
+import io.gitsearch.search.SearchService;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.ResetCommand;
@@ -26,12 +26,12 @@ import java.util.Map;
 public class GitService {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private ElasticSearchService elasticSearchService;
+    private SearchService searchService;
     private Git git;
     private String url;
 
-    public GitService(Git git, ElasticSearchService elasticSearchService, String url) {
-        this.elasticSearchService = elasticSearchService;
+    public GitService(Git git, SearchService searchService, String url) {
+        this.searchService = searchService;
         this.git = git;
         this.url = url;
     }
@@ -84,7 +84,7 @@ public class GitService {
         treeWalk.setRecursive(true);
         while (treeWalk.next()) {
             ObjectId objectId = treeWalk.getObjectId(0);
-            elasticSearchService.upsert(objectId.getName(), getBranchName(ref), treeWalk.getPathString(), getFileContent(objectId), url);
+            searchService.upsert(objectId.getName(), getBranchName(ref), treeWalk.getPathString(), getFileContent(objectId), url);
         }
     }
 
@@ -94,14 +94,14 @@ public class GitService {
             ObjectId oldId = diffEntry.getOldId().toObjectId();
             switch (diffEntry.getChangeType()) {
                 case DELETE:
-                    elasticSearchService.delete(oldId.getName(), branch, diffEntry.getOldPath(), url);
+                    searchService.delete(oldId.getName(), branch, diffEntry.getOldPath(), url);
                     break;
                 case MODIFY:
-                    elasticSearchService.delete(oldId.getName(), branch, diffEntry.getOldPath(), url);
-                    elasticSearchService.upsert(newId.getName(), branch, diffEntry.getNewPath(), getFileContent(newId), url);
+                    searchService.delete(oldId.getName(), branch, diffEntry.getOldPath(), url);
+                    searchService.upsert(newId.getName(), branch, diffEntry.getNewPath(), getFileContent(newId), url);
                     break;
                 case ADD:
-                    elasticSearchService.upsert(newId.getName(), branch, diffEntry.getNewPath(), getFileContent(newId), url);
+                    searchService.upsert(newId.getName(), branch, diffEntry.getNewPath(), getFileContent(newId), url);
                     break;
                 case RENAME:
                     logger.error("RENAME is an unknown case");

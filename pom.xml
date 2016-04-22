@@ -16,6 +16,7 @@
         <junit.version>4.11</junit.version>
         <elasticsearch.version>2.3.1</elasticsearch.version>
         <commons-io.version>2.4</commons-io.version>
+        <mongodb.version>3.2.2</mongodb.version>
         <exec-maven-plugin.version>1.2.1</exec-maven-plugin.version>
         <maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
     </properties>
@@ -64,7 +65,7 @@
         <dependency>
             <groupId>org.elasticsearch.module</groupId>
             <artifactId>lang-groovy</artifactId>
-            <version>2.3.1</version>
+            <version>${elasticsearch.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -76,6 +77,11 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>${commons-io.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>${mongodb.version}</version>
         </dependency>
     </dependencies>
     <build>

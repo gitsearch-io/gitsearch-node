@@ -1,4 +1,4 @@
-package io.gitsearch.elasticsearch.setup;
+package io.gitsearch.search.setup;
 
 import java.util.Collection;
 import org.elasticsearch.Version;

@@ -1,4 +1,4 @@
-package io.gitsearch.elasticsearch.setup;
+package io.gitsearch.search.setup;
 
 import org.apache.commons.io.FileUtils;
 import org.elasticsearch.Version;
@@ -62,7 +62,7 @@ public abstract class  AbstractElasticsearchTest {
         try {
             FileUtils.deleteDirectory(new File(ES_WORKING_DIR));
         } catch (IOException e) {
-            throw new RuntimeException("Could not delete data directory of embedded elasticsearch server", e);
+            throw new RuntimeException("Could not delete data directory of embedded search server", e);
         }
     }
 }
