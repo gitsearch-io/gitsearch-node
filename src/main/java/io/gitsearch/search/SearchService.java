@@ -6,15 +6,20 @@ import io.gitsearch.search.dto.FileBranchDTO;
 import io.gitsearch.search.dto.SourceFileDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import static io.gitsearch.Utils.toBase64;
 
+@Service("SearchService")
 public class SearchService {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
+
     private IndexDAO indexDAO;
 
-    public SearchService(String host) {
-        indexDAO = new ESIndexDAO(host);
+    @Autowired
+    public SearchService(IndexDAO indexDAO) {
+        this.indexDAO = indexDAO;
     }
 
     public void upsert(String id, String branch, String path, String content, String url) {

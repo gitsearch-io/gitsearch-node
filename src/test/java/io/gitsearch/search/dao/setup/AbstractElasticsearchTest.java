@@ -1,4 +1,4 @@
-package io.gitsearch.search.setup;
+package io.gitsearch.search.dao.setup;
 
 import org.apache.commons.io.FileUtils;
 import org.elasticsearch.Version;

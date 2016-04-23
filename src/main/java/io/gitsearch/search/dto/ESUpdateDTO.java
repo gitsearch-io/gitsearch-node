@@ -1,20 +1,18 @@
 package io.gitsearch.search.dto;
 
-import io.searchbox.core.Update;
-
 import java.util.HashMap;
 import java.util.Map;
 
-public class UpdateDTO {
+public class ESUpdateDTO {
     private String script;
     private Map<String, Object> params = new HashMap<>();;
-    private SourceFileDTO sourceFileDTO;
+    private SourceFileDTO upsert;
 
     public String getScript() {
         return script;
     }
 
-    public UpdateDTO setScript(String script) {
+    public ESUpdateDTO setScript(String script) {
         this.script = script;
         return this;
     }
@@ -23,26 +21,26 @@ public class UpdateDTO {
         return params;
     }
 
-    public UpdateDTO addParam(String paramName, Object paramValue) {
+    public ESUpdateDTO addParam(String paramName, Object paramValue) {
         params.put(paramName, paramValue);
         return this;
     }
 
     public SourceFileDTO setSourceFileDTO() {
-        return sourceFileDTO;
+        return upsert;
     }
 
-    public UpdateDTO setSourceFileDTO(SourceFileDTO sourceFileDTO) {
-        this.sourceFileDTO = sourceFileDTO;
+    public ESUpdateDTO setSourceFileDTO(SourceFileDTO sourceFileDTO) {
+        this.upsert = sourceFileDTO;
         return this;
     }
 
     @Override
     public String toString() {
-        return "UpdateDTO{" +
+        return "ESUpdateDTO{" +
                 "script='" + script + '\'' +
                 ", params=" + params +
-                ", upsert=" + sourceFileDTO +
+                ", upsert=" + upsert +
                 '}';
     }
 }
