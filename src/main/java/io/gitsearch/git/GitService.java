@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class GitService {
@@ -36,12 +37,14 @@ public class GitService {
     @Autowired
     private SearchService searchService;
 
-    public void pullUpdates(Git git, String url) {
+    public boolean pullUpdates(Git git, String url) {
+        boolean updated = false;
         try {
             Map<String, ObjectId> currentWorkTree = getCurrentWorkTrees(git);
             Collection<TrackingRefUpdate> fetchResults = fetch(git);
 
             for (TrackingRefUpdate update : fetchResults) {
+                updated = true;
                 switch (update.getResult()) {
                     case NEW:
                         merge(git, update.getLocalName());
@@ -59,11 +62,13 @@ public class GitService {
         } catch (GitAPIException | IOException e) {
             logger.error(e.getMessage(), e);
         }
+
+        return updated;
     }
 
     public void saveAllFilesInRepository(Git git, String url) {
         try {
-            for(Ref ref: getBranches(git)) {
+            for (Ref ref: getBranches(git)) {
                 saveAllFilesInBranch(git, url, ref.getName());
             }
         } catch (GitAPIException | IOException e) {
@@ -84,24 +89,42 @@ public class GitService {
         treeWalk.setRecursive(true);
         while (treeWalk.next()) {
             ObjectId objectId = treeWalk.getObjectId(0);
-            searchService.upsert(objectId.getName(), getBranchName(ref), treeWalk.getPathString(), getFileContent(git, objectId), url);
+            searchService.upsert(objectId.getName(),
+                    getBranchName(ref),
+                    treeWalk.getPathString(),
+                    getFileContent(git, objectId),
+                    url);
         }
     }
 
     private void updateChangedFiles(Git git, String url, List<DiffEntry> diffs, String branch) throws IOException {
-        for(DiffEntry diffEntry : diffs) {
+        for (DiffEntry diffEntry : diffs) {
             ObjectId newId = diffEntry.getNewId().toObjectId();
             ObjectId oldId = diffEntry.getOldId().toObjectId();
             switch (diffEntry.getChangeType()) {
                 case DELETE:
-                    searchService.delete(oldId.getName(), branch, diffEntry.getOldPath(), url);
+                    searchService.delete(oldId.getName(),
+                            branch,
+                            diffEntry.getOldPath(),
+                            url);
                     break;
                 case MODIFY:
-                    searchService.delete(oldId.getName(), branch, diffEntry.getOldPath(), url);
-                    searchService.upsert(newId.getName(), branch, diffEntry.getNewPath(), getFileContent(git, newId), url);
+                    searchService.delete(oldId.getName(),
+                            branch,
+                            diffEntry.getOldPath(),
+                            url);
+                    searchService.upsert(newId.getName(),
+                            branch,
+                            diffEntry.getNewPath(),
+                            getFileContent(git, newId),
+                            url);
                     break;
                 case ADD:
-                    searchService.upsert(newId.getName(), branch, diffEntry.getNewPath(), getFileContent(git, newId), url);
+                    searchService.upsert(newId.getName(),
+                            branch,
+                            diffEntry.getNewPath(),
+                            getFileContent(git, newId),
+                            url);
                     break;
                 case RENAME:
                     logger.error("RENAME is an unknown case");
@@ -159,5 +182,17 @@ public class GitService {
     private String getBranchName(String branchRef) {
         final String branchPrefix = "refs/remotes/origin/";
         return branchRef.substring(branchPrefix.length(), branchRef.length());
+    }
+
+    public List<String> getBranchNames(Git git) {
+        try {
+            return getBranches(git)
+                    .stream()
+                    .map(branchRef -> getBranchName(branchRef.getName()))
+                    .collect(Collectors.toList());
+        } catch (GitAPIException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

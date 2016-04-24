@@ -10,16 +10,10 @@ import org.springframework.stereotype.Service;
 
 import static io.gitsearch.Utils.toBase64;
 
-@Service("SearchService")
+@Service()
 public class SearchService {
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
-
-    private SourceCodeDAO sourceCodeDAO;
-
     @Autowired
-    public SearchService(SourceCodeDAO sourceCodeDAO) {
-        this.sourceCodeDAO = sourceCodeDAO;
-    }
+    private SourceCodeDAO sourceCodeDAO;
 
     public void upsert(String id, String branch, String path, String content, String url) {
         SourceFileDTO sourceFileDTO = new SourceFileDTO()

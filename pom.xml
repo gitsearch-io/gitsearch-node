@@ -19,6 +19,7 @@
         <exec-maven-plugin.version>1.2.1</exec-maven-plugin.version>
         <maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
         <spring.version>4.2.5.RELEASE</spring.version>
+        <mongo.version>3.2.2</mongo.version>
     </properties>
     <repositories>
         <repository>
@@ -61,11 +62,13 @@
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch</artifactId>
             <version>${elasticsearch.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.elasticsearch.module</groupId>
             <artifactId>lang-groovy</artifactId>
             <version>${elasticsearch.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -87,6 +90,12 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
             <version>${spring.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>${mongo.version}</version>
         </dependency>
     </dependencies>
     <build>

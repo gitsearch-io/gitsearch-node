@@ -1,2 +1,5 @@
 elasticsearch.host=http://localhost:9200
 rabbitmq.host=localhost
+mongodb.host=localhost
+mongodb.port=27017
+mongodb.db=gitsearch
