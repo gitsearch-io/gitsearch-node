@@ -20,6 +20,7 @@
         <maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
         <spring.version>4.2.5.RELEASE</spring.version>
         <mongo.version>3.2.2</mongo.version>
+        <embeddedmongo.version>1.50.3</embeddedmongo.version>
     </properties>
     <repositories>
         <repository>
@@ -96,6 +97,12 @@
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
             <version>${mongo.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>de.flapdoodle.embed</groupId>
+            <artifactId>de.flapdoodle.embed.mongo</artifactId>
+            <version>${embeddedmongo.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <build>
