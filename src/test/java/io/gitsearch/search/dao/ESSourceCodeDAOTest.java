@@ -25,9 +25,9 @@ import static org.junit.Assert.assertFalse;
 
 @TestPropertySource(locations="classpath:config.test.properties")
 @ContextConfiguration(loader = AnnotationConfigContextLoader.class,
-        classes = {ESConnection.class, ESIndexDAO.class})
+        classes = {ESConnection.class, ESSourceCodeDAO.class})
 @RunWith(SpringJUnit4ClassRunner.class)
-public class ESIndexDAOTest extends AbstractElasticsearchTest{
+public class ESSourceCodeDAOTest extends AbstractElasticsearchTest{
     private final String ES_INDEX = "gitsearch";
     private final String ES_TYPE = "sourcecode";
 
@@ -38,7 +38,7 @@ public class ESIndexDAOTest extends AbstractElasticsearchTest{
     private String url = "http://repository.com";
 
     @Autowired
-    private ESIndexDAO dao;
+    private ESSourceCodeDAO dao;
     private Client esClient;
 
     @Before

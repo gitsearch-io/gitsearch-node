@@ -3,9 +3,7 @@ package io.gitsearch.search.dao;
 import io.gitsearch.search.dto.ESUpdateDTO;
 import io.gitsearch.search.dto.SourceFileDTO;
 import io.searchbox.client.JestClient;
-import io.searchbox.client.JestClientFactory;
 import io.searchbox.client.JestResult;
-import io.searchbox.client.config.HttpClientConfig;
 import io.searchbox.core.Update;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +13,7 @@ import org.springframework.stereotype.Repository;
 import java.io.IOException;
 
 @Repository
-public class ESIndexDAO implements IndexDAO {
+public class ESSourceCodeDAO implements SourceCodeDAO {
     private final String ES_INDEX = "gitsearch";
     private final String ES_TYPE = "sourcecode";
 

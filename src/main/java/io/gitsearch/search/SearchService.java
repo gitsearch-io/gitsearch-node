@@ -1,7 +1,6 @@
 package io.gitsearch.search;
 
-import io.gitsearch.search.dao.ESIndexDAO;
-import io.gitsearch.search.dao.IndexDAO;
+import io.gitsearch.search.dao.SourceCodeDAO;
 import io.gitsearch.search.dto.FileBranchDTO;
 import io.gitsearch.search.dto.SourceFileDTO;
 import org.slf4j.Logger;
@@ -15,11 +14,11 @@ import static io.gitsearch.Utils.toBase64;
 public class SearchService {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private IndexDAO indexDAO;
+    private SourceCodeDAO sourceCodeDAO;
 
     @Autowired
-    public SearchService(IndexDAO indexDAO) {
-        this.indexDAO = indexDAO;
+    public SearchService(SourceCodeDAO sourceCodeDAO) {
+        this.sourceCodeDAO = sourceCodeDAO;
     }
 
     public void upsert(String id, String branch, String path, String content, String url) {
@@ -27,12 +26,12 @@ public class SearchService {
                 .setUrl(url)
                 .setContent(content)
                 .addFileBranch(new FileBranchDTO(branch, path));
-        indexDAO.indexFile(id + toBase64(url), sourceFileDTO);
+        sourceCodeDAO.indexFile(id + toBase64(url), sourceFileDTO);
     }
 
     public void delete(String id, String branch, String path, String url) {
         SourceFileDTO sourceFileDTO = new SourceFileDTO()
                 .addFileBranch(new FileBranchDTO(branch, path));
-        indexDAO.removeFileFromIndex(id + toBase64(url), sourceFileDTO);
+        sourceCodeDAO.removeFileFromIndex(id + toBase64(url), sourceFileDTO);
     }
 }
