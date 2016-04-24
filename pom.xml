@@ -18,6 +18,7 @@
         <commons-io.version>2.4</commons-io.version>
         <exec-maven-plugin.version>1.2.1</exec-maven-plugin.version>
         <maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
+        <spring.version>4.2.5.RELEASE</spring.version>
     </properties>
     <repositories>
         <repository>
@@ -64,7 +65,7 @@
         <dependency>
             <groupId>org.elasticsearch.module</groupId>
             <artifactId>lang-groovy</artifactId>
-            <version>2.3.1</version>
+            <version>${elasticsearch.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -77,6 +78,16 @@
             <artifactId>commons-io</artifactId>
             <version>${commons-io.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -85,7 +96,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>${exec-maven-plugin.version}</version>
                 <configuration>
-                    <mainClass>io.gitsearch.Main</mainClass>
+                    <mainClass>io.gitsearch.Bootstrap</mainClass>
                 </configuration>
             </plugin>
             <plugin>

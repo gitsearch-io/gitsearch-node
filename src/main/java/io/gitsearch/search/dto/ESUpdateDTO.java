@@ -1,40 +1,43 @@
-package io.gitsearch.elasticsearch.dto;
+package io.gitsearch.search.dto;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class UpdateDTO {
+public class ESUpdateDTO {
     private String script;
     private Map<String, Object> params = new HashMap<>();;
-    private UpsertDTO upsert;
+    private SourceFileDTO upsert;
 
     public String getScript() {
         return script;
     }
 
-    public void setScript(String script) {
+    public ESUpdateDTO setScript(String script) {
         this.script = script;
+        return this;
     }
 
     public Map<String, Object> getParams() {
         return params;
     }
 
-    public void addParam(String paramName, Object paramValue) {
+    public ESUpdateDTO addParam(String paramName, Object paramValue) {
         params.put(paramName, paramValue);
+        return this;
     }
 
-    public UpsertDTO getUpsert() {
+    public SourceFileDTO setSourceFileDTO() {
         return upsert;
     }
 
-    public void setUpsert(UpsertDTO upsert) {
-        this.upsert = upsert;
+    public ESUpdateDTO setSourceFileDTO(SourceFileDTO sourceFileDTO) {
+        this.upsert = sourceFileDTO;
+        return this;
     }
 
     @Override
     public String toString() {
-        return "UpdateDTO{" +
+        return "ESUpdateDTO{" +
                 "script='" + script + '\'' +
                 ", params=" + params +
                 ", upsert=" + upsert +

@@ -12,7 +12,8 @@ import java.io.IOException;
 
 import static io.gitsearch.Utils.toBase64;
 
-public class GitRepositoryService {
+@org.springframework.stereotype.Repository
+public class GitRepositoryDAO {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public Git cloneRepository(String url) throws GitAPIException {

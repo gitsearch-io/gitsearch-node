@@ -1,4 +1,4 @@
-package io.gitsearch.elasticsearch.dto;
+package io.gitsearch.search.dto;
 
 public class FileBranchDTO {
     private String branchName;

@@ -1,26 +1,35 @@
-package io.gitsearch.elasticsearch;
+package io.gitsearch.search.dao;
 
-import io.gitsearch.elasticsearch.setup.AbstractElasticsearchTest;
+import io.gitsearch.search.dto.FileBranchDTO;
+import io.gitsearch.search.dto.SourceFileDTO;
+import io.gitsearch.search.dao.setup.AbstractElasticsearchTest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.client.Client;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static io.gitsearch.Utils.toBase64;
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertFalse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-
-public class ElasticSearchServiceTest extends AbstractElasticsearchTest {
-    private final String ES_URL = "http://localhost:9205";
+@TestPropertySource(locations="classpath:config.test.properties")
+@ContextConfiguration(loader = AnnotationConfigContextLoader.class,
+        classes = {ESConnection.class, ESIndexDAO.class})
+@RunWith(SpringJUnit4ClassRunner.class)
+public class ESIndexDAOTest extends AbstractElasticsearchTest{
     private final String ES_INDEX = "gitsearch";
-    private final String ES_TYPE = "codefile";
+    private final String ES_TYPE = "sourcecode";
 
     private String documentID = "1";
     private String branch = "master";
@@ -28,31 +37,30 @@ public class ElasticSearchServiceTest extends AbstractElasticsearchTest {
     private String content = "file content";
     private String url = "http://repository.com";
 
-    private ElasticSearchService elasticSearchService;
-    private Client client;
+    @Autowired
+    private ESIndexDAO dao;
+    private Client esClient;
 
     @Before
     public void setUp() throws Exception {
-        client = getClient();
-        elasticSearchService = new ElasticSearchService(ES_URL);
-
-        boolean indexExists = client.admin().indices().prepareExists(ES_INDEX).execute().actionGet().isExists();
+        esClient = getClient();
+        boolean indexExists = esClient.admin().indices().prepareExists(ES_INDEX).execute().actionGet().isExists();
         if(!indexExists) {
-            client.admin().indices().prepareCreate(ES_INDEX).execute().actionGet();
+            esClient.admin().indices().prepareCreate(ES_INDEX).execute().actionGet();
         }
         getClient().admin().cluster().prepareHealth().setWaitForGreenStatus().execute().actionGet();
     }
 
     @After
     public void tearDown() throws Exception {
-        client.admin().indices().prepareDelete(ES_INDEX).execute().actionGet();
+        esClient.admin().indices().prepareDelete(ES_INDEX).execute().actionGet();
     }
 
     @Test
     public void upsert_should_create_document_in_es() throws Exception {
-        elasticSearchService.upsert(documentID, branch, filePath, content, url);
+        dao.indexFile(documentID, getSourceFileDTO(new FileBranchDTO(branch, filePath)));
 
-        GetResponse response = client.prepareGet(ES_INDEX, ES_TYPE, documentID + toBase64(url)).get();
+        GetResponse response = esClient.prepareGet(ES_INDEX, ES_TYPE, documentID).get();
         List<Map<String, String>> fileBranches = parseFileBranches(response);
         assertEquals(1, fileBranches.size());
         assertEquals(filePath, fileBranches.get(0).get("filePath"));
@@ -63,10 +71,11 @@ public class ElasticSearchServiceTest extends AbstractElasticsearchTest {
     @Test
     public void upsert_should_update_document_in_es() throws Exception {
         String featureBranch = "feature";
-        elasticSearchService.upsert(documentID, branch, filePath, content, url);
-        elasticSearchService.upsert(documentID, featureBranch, filePath, content, url);
 
-        GetResponse response = client.prepareGet(ES_INDEX, ES_TYPE, documentID + toBase64(url)).get();
+        dao.indexFile(documentID, getSourceFileDTO(new FileBranchDTO(branch, filePath)));
+        dao.indexFile(documentID, getSourceFileDTO(new FileBranchDTO(featureBranch, filePath)));
+
+        GetResponse response = esClient.prepareGet(ES_INDEX, ES_TYPE, documentID).get();
         List<Map<String, String>> fileBranches = parseFileBranches(response);
         assertEquals(2, fileBranches.size());
         assertEquals(filePath, fileBranches.get(0).get("filePath"));
@@ -85,9 +94,9 @@ public class ElasticSearchServiceTest extends AbstractElasticsearchTest {
         fileBranches.add(fileBranch);
         insertDocument(documentID, content, fileBranches);
 
-        elasticSearchService.delete(documentID, branch, filePath, url);
+        dao.removeFileFromIndex(documentID, getSourceFileDTO(new FileBranchDTO(branch, filePath)));
 
-        GetResponse response = client.prepareGet(ES_INDEX, ES_TYPE, documentID).get();
+        GetResponse response = esClient.prepareGet(ES_INDEX, ES_TYPE, documentID).get();
         assertFalse(response.isExists());
     }
 
@@ -108,9 +117,9 @@ public class ElasticSearchServiceTest extends AbstractElasticsearchTest {
 
         insertDocument(documentID, content, fileBranches);
 
-        elasticSearchService.delete(documentID, featureBranch, filePath, url);
+        dao.removeFileFromIndex(documentID, getSourceFileDTO(new FileBranchDTO(featureBranch, filePath)));
 
-        GetResponse response = client.prepareGet(ES_INDEX, ES_TYPE, documentID + toBase64(url)).get();
+        GetResponse response = esClient.prepareGet(ES_INDEX, ES_TYPE, documentID).get();
         List<Map<String, String>> actualFileBranches = parseFileBranches(response);
         assertEquals(1, actualFileBranches.size());
         assertEquals(filePath, actualFileBranches.get(0).get("filePath"));
@@ -123,10 +132,17 @@ public class ElasticSearchServiceTest extends AbstractElasticsearchTest {
         json.put("content", content);
         json.put("fileBranches", fileBranches);
 
-        client.prepareIndex(ES_INDEX, ES_TYPE, documentID + toBase64(url)).setSource(json).get();
+        esClient.prepareIndex(ES_INDEX, ES_TYPE, documentID).setSource(json).get();
     }
 
     private List<Map<String, String>> parseFileBranches(GetResponse response) {
         return (List<Map<String, String>>)response.getSource().get("fileBranches");
+    }
+
+    private SourceFileDTO getSourceFileDTO(FileBranchDTO fileBranchDTO) {
+        return new SourceFileDTO()
+                .setUrl(url)
+                .setContent(content)
+                .addFileBranch(fileBranchDTO);
     }
 }
