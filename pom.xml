@@ -21,6 +21,7 @@
         <spring.version>4.2.5.RELEASE</spring.version>
         <mongo.version>3.2.2</mongo.version>
         <embeddedmongo.version>1.50.3</embeddedmongo.version>
+        <qpid.version>0.28</qpid.version>
     </properties>
     <repositories>
         <repository>
@@ -102,6 +103,12 @@
             <groupId>de.flapdoodle.embed</groupId>
             <artifactId>de.flapdoodle.embed.mongo</artifactId>
             <version>${embeddedmongo.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.qpid</groupId>
+            <artifactId>qpid-broker</artifactId>
+            <version>${qpid.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

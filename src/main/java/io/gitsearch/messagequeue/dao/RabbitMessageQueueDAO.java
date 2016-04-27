@@ -38,9 +38,10 @@ public class RabbitMessageQueueDAO implements MessageQueueDAO {
                 } catch(Exception e) {
                     logger.error(e.toString(), e);
                 }
+                channel.basicAck(envelope.getDeliveryTag(), false);
             }
         };
 
-        channel.basicConsume(queue.name(), true, args, consumer);
+        channel.basicConsume(queue.name(), false, args, consumer);
     }
 }

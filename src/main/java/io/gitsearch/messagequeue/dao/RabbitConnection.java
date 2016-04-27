@@ -20,7 +20,10 @@ public class RabbitConnection {
     public Channel getMessageChannel() throws IOException, TimeoutException {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(env.getProperty("rabbitmq.host"));
+        factory.setPort(Integer.parseInt(env.getProperty("rabbitmq.port")));
         Connection connection = factory.newConnection();
-        return connection.createChannel();
+        Channel channel = connection.createChannel();
+        channel.basicQos(1);
+        return channel;
     }
 }
