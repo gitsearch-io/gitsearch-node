@@ -1,6 +1,5 @@
 # gitsearch-node
-This is a services that clones public git repositories and index the source code from all branches in elasticsearch
-to make it searchable.
+This is a services that clones public git repositories and index the source code from all branches to make them searchable.
 After the repository is cloned the service can perform a git pull and reindex changed files and index new files.
 
 ## Dependencies
