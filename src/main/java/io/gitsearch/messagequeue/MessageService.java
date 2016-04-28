@@ -35,7 +35,7 @@ public class MessageService {
         }
     }
 
-    private void updateRepository(String message) {
+    public void updateRepository(String message) {
         try (Git git = gitRepositoryService.getRepository(message)){
             if (gitService.pullUpdates(git, message)) {
                 repositoryService.update(message, gitService.getBranchNames(git));
@@ -45,7 +45,7 @@ public class MessageService {
         }
     }
 
-    private void cloneRepository(String message) {
+    public void cloneRepository(String message) {
         try (Git git = gitRepositoryService.cloneRepository(message)) {
             if (git != null) {
                 gitService.saveAllFilesInRepository(git, message);

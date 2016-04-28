@@ -22,6 +22,7 @@
         <mongo.version>3.2.2</mongo.version>
         <embeddedmongo.version>1.50.3</embeddedmongo.version>
         <qpid.version>0.28</qpid.version>
+        <mockito.version>1.10.19</mockito.version>
     </properties>
     <repositories>
         <repository>
@@ -109,6 +110,12 @@
             <groupId>org.apache.qpid</groupId>
             <artifactId>qpid-broker</artifactId>
             <version>${qpid.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
