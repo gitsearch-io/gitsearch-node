@@ -4,6 +4,7 @@ import com.rabbitmq.client.Channel;
 import io.gitsearch.messagequeue.Queue;
 import io.gitsearch.messagequeue.dao.setup.AbstractRabbitTest;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,33 +28,32 @@ public class RabbitMessageQueueDAOTest extends AbstractRabbitTest {
     @Autowired
     private RabbitMessageQueueDAO dao;
 
+    final String updateMessage = "foo";
+    final String cloneMessage = "bar";
+
+    @Before
+    public void setUp() throws Exception {
+
+    }
+
     @Test
     public void consumers_should_prioritize_the_clone_queue() throws Exception {
         CountDownLatch latch = new CountDownLatch(3);
-        final String updateMessage = "foo";
-        final String cloneMessage = "bar";
+
+        sendMessage(Queue.UPDATE, updateMessage);
+        sendMessage(Queue.UPDATE, updateMessage);
+        sendMessage(Queue.CLONE, cloneMessage);
 
         dao.setConsumer(Queue.CLONE, receivedMessage -> {
             assertEquals(cloneMessage, receivedMessage);
-            assertEquals(2, latch.getCount());
+            assertEquals(3, latch.getCount());
             latch.countDown();
         });
 
         dao.setConsumer(Queue.UPDATE, receivedMessage -> {
             latch.countDown();
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                fail("Catched unexpected exception");
-            }
             assertEquals(updateMessage, receivedMessage);
-
         });
-
-        sendMessage(Queue.UPDATE, updateMessage);
-        sendMessage(Queue.UPDATE, updateMessage);
-        sendMessage(Queue.CLONE, cloneMessage);
 
         assertTrue("Test timed out", latch.await(10, TimeUnit.SECONDS));
     }
