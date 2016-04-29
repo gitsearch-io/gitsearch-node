@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/gitsearch-io/gitsearch-node.svg?branch=master)](https://travis-ci.org/gitsearch-io/gitsearch-node)
 # gitsearch-node
 This is a services that clones public git repositories and index the source code from all branches to make them searchable.
 After the repository is cloned the service can perform a git pull and reindex changed files and index new files.
