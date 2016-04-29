@@ -32,4 +32,23 @@ public class FileBranchDTO {
                 ", filePath='" + filePath + '\'' +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FileBranchDTO that = (FileBranchDTO) o;
+
+        if (branchName != null ? !branchName.equals(that.branchName) : that.branchName != null) return false;
+        return filePath != null ? filePath.equals(that.filePath) : that.filePath == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = branchName != null ? branchName.hashCode() : 0;
+        result = 31 * result + (filePath != null ? filePath.hashCode() : 0);
+        return result;
+    }
 }

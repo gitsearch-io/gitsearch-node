@@ -44,4 +44,25 @@ public class SourceFileDTO {
                 ", fileBranches=" + fileBranches +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SourceFileDTO that = (SourceFileDTO) o;
+
+        if (content != null ? !content.equals(that.content) : that.content != null) return false;
+        if (url != null ? !url.equals(that.url) : that.url != null) return false;
+        return fileBranches != null ? fileBranches.equals(that.fileBranches) : that.fileBranches == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = content != null ? content.hashCode() : 0;
+        result = 31 * result + (url != null ? url.hashCode() : 0);
+        result = 31 * result + (fileBranches != null ? fileBranches.hashCode() : 0);
+        return result;
+    }
 }
