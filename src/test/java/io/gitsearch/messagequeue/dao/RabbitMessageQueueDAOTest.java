@@ -16,7 +16,6 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -28,13 +27,8 @@ public class RabbitMessageQueueDAOTest extends AbstractRabbitTest {
     @Autowired
     private RabbitMessageQueueDAO dao;
 
-    final String updateMessage = "foo";
-    final String cloneMessage = "bar";
-
-    @Before
-    public void setUp() throws Exception {
-
-    }
+    private final String updateMessage = "foo";
+    private final String cloneMessage = "bar";
 
     @Test
     public void consumers_should_prioritize_the_clone_queue() throws Exception {

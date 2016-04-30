@@ -31,11 +31,11 @@ public class ESSourceCodeDAOTest extends AbstractElasticsearchTest{
     private final String ES_INDEX = "gitsearch";
     private final String ES_TYPE = "sourcecode";
 
-    private String documentID = "1";
-    private String branch = "master";
-    private String filePath = "/path/to/file";
-    private String content = "file content";
-    private String url = "http://repository.com";
+    private final String documentID = "1";
+    private final String branch = "master";
+    private final String filePath = "/path/to/file";
+    private final String content = "file content";
+    private final String url = "http://repository.com";
 
     @Autowired
     private ESSourceCodeDAO dao;

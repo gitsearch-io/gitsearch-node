@@ -15,6 +15,9 @@ import org.junit.BeforeClass;
 import java.io.IOException;
 
 public abstract class AbstractMongoTest {
+    private static final String HOST = "localhost";
+    private static final int PORT = 12345;
+
     private static MongoClient mongoClient;
     private static MongodExecutable mongodExecutable;
     private static MongodProcess mongod;
@@ -23,16 +26,15 @@ public abstract class AbstractMongoTest {
     public static void startMongo() throws IOException {
         MongodStarter starter = MongodStarter.getDefaultInstance();
 
-        int port = 12345;
+
         IMongodConfig mongodConfig = new MongodConfigBuilder()
                 .version(Version.Main.PRODUCTION)
-                .net(new Net(port, Network.localhostIsIPv6()))
+                .net(new Net(PORT, Network.localhostIsIPv6()))
                 .build();
 
         mongodExecutable = starter.prepare(mongodConfig);
         mongod = mongodExecutable.start();
-        mongoClient = new MongoClient("localhost", port);
-        System.out.println("hello");
+        mongoClient = new MongoClient(HOST, PORT);
     }
 
     @AfterClass

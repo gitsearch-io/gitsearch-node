@@ -37,47 +37,47 @@ public class MessageServiceTest {
     @InjectMocks
     private MessageService messageService;
 
-    private final String URL = "https://foo.bar";
-    private final List<String> BRANCHES = Arrays.asList("master", "feature");
+    private final String url = "https://foo.bar";
+    private final List<String> branches = Arrays.asList("master", "feature");
 
     @Test
     public void updateRepository_should_get_git_repo_and_update_database_with_changes() throws IOException, GitAPIException {
-        when(gitRepositoryServiceMock.getRepository(URL)).thenReturn(gitMock);
-        when(gitServiceMock.pullUpdates(gitMock, URL)).thenReturn(true);
-        when(gitServiceMock.getBranchNames(gitMock)).thenReturn(BRANCHES);
+        when(gitRepositoryServiceMock.getRepository(url)).thenReturn(gitMock);
+        when(gitServiceMock.pullUpdates(gitMock, url)).thenReturn(true);
+        when(gitServiceMock.getBranchNames(gitMock)).thenReturn(branches);
 
-        messageService.updateRepository(URL);
+        messageService.updateRepository(url);
 
-        verify(gitRepositoryServiceMock).getRepository(URL);
-        verify(gitServiceMock).pullUpdates(gitMock, URL);
+        verify(gitRepositoryServiceMock).getRepository(url);
+        verify(gitServiceMock).pullUpdates(gitMock, url);
         verify(gitServiceMock).getBranchNames(gitMock);
-        verify(repositoryServiceMock).update(URL, BRANCHES);
+        verify(repositoryServiceMock).update(url, branches);
         verifyNoMoreInteractions(gitRepositoryServiceMock, gitServiceMock, repositoryServiceMock);
     }
 
     @Test
     public void updateRepository_should_get_git_repo() throws IOException {
-        when(gitRepositoryServiceMock.getRepository(URL)).thenReturn(gitMock);
-        when(gitServiceMock.pullUpdates(gitMock, URL)).thenReturn(false);
+        when(gitRepositoryServiceMock.getRepository(url)).thenReturn(gitMock);
+        when(gitServiceMock.pullUpdates(gitMock, url)).thenReturn(false);
 
-        messageService.updateRepository(URL);
+        messageService.updateRepository(url);
 
-        verify(gitRepositoryServiceMock).getRepository(URL);
-        verify(gitServiceMock).pullUpdates(gitMock, URL);
+        verify(gitRepositoryServiceMock).getRepository(url);
+        verify(gitServiceMock).pullUpdates(gitMock, url);
         verifyNoMoreInteractions(gitRepositoryServiceMock, gitServiceMock, repositoryServiceMock);
     }
 
     @Test
     public void cloneRepository_should_clone_git_repo_and_call_repo_service() throws GitAPIException {
-        when(gitRepositoryServiceMock.cloneRepository(URL)).thenReturn(gitMock);
-        when(gitServiceMock.getBranchNames(gitMock)).thenReturn(BRANCHES);
+        when(gitRepositoryServiceMock.cloneRepository(url)).thenReturn(gitMock);
+        when(gitServiceMock.getBranchNames(gitMock)).thenReturn(branches);
 
-        messageService.cloneRepository(URL);
+        messageService.cloneRepository(url);
 
-        verify(gitRepositoryServiceMock).cloneRepository(URL);
-        verify(gitServiceMock).saveAllFilesInRepository(gitMock, URL);
+        verify(gitRepositoryServiceMock).cloneRepository(url);
+        verify(gitServiceMock).saveAllFilesInRepository(gitMock, url);
         verify(gitServiceMock).getBranchNames(gitMock);
-        verify(repositoryServiceMock).insert(URL, BRANCHES);
+        verify(repositoryServiceMock).insert(url, branches);
         verifyNoMoreInteractions(gitRepositoryServiceMock, gitServiceMock, repositoryServiceMock);
     }
 }
